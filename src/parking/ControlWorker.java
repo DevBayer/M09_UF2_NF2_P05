@@ -1,7 +1,7 @@
 package parking;
 
 /**
- * Created by 23878410v on 10/11/16.
+ * Created by Lluís Bayer Soler on 10/11/16.
  */
 public class ControlWorker extends Thread {
 
@@ -17,26 +17,43 @@ public class ControlWorker extends Thread {
         this.GateOutWorker.start();
     }
 
+    public String getInforme(boolean extended){
+        if(extended){
+            return "\nControlWorker::run() QueueList: "+parking.QueueListCotxe().size()+
+                    " ParkedList: "+parking.QueueParkedCotxe().size()+
+                    " UnParkedList: "+parking.QueueUnParkedCotxe().size()+
+                    " TotalCotxes: "+parking.LogCotxe().size()+
+                    "\n"+
+                    "GateInWorker::State("+GateInWorker.getState()+") "+
+                    "GateOutWorker::State("+GateOutWorker.getState()+")"+
+                    "\n"+
+                    "Parking::hasAvailableSpace() -> "+ parking.hasAvailableSpace()+
+                    "\n- Llistat Cotxes: \n" + parking.getInformeLogCotxe()+"\n";
+        }else{
+            return "ControlWorker::run() QueueList: "+parking.QueueListCotxe().size()+" ParkedList: "+parking.QueueParkedCotxe().size()+" UnParkedList: "+parking.QueueUnParkedCotxe().size()+" TotalCotxes: "+parking.LogCotxe().size();
+        }
+    }
+
     @Override
     public void run() {
         while(true){
-            System.out.println("ControlWorker::run() QueueList: "+parking.QueueListCotxe().size()+" ParkedList: "+parking.QueueParkedCotxe().size()+" UnParkedList: "+parking.QueueUnParkedCotxe().size()+" TotalCotxesQueHanPassat: "+parking.LogCotxe().size());
+            parking.debug(this.getInforme(false));
             if(parking.hasAvailableSpace() && parking.hasQueueListCotxe() > 0 && GateInWorker.getState().equals(State.WAITING)){
-                System.out.println("ControlWorker::Notify GateInWorker");
+                parking.debug("ControlWorker::Notify GateInWorker");
                 synchronized (GateInWorker) {
                     GateInWorker.notify();
                 }
             }
 
             if(parking.hasQueueUnParkedCotxe() > 0 && GateOutWorker.getState().equals(State.WAITING)){
-                System.out.println("ControlWorker::Notify GateOutWorker");
+                parking.debug("ControlWorker::Notify GateOutWorker");
                 synchronized (GateOutWorker){
                     GateOutWorker.notify();
                 }
             }
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(1);
             }catch(InterruptedException e){ }
         }
     }

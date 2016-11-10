@@ -3,12 +3,13 @@ package parking;
 import java.util.Date;
 
 /**
- * Created by 23878410v on 09/11/16.
+ * Created by Lluís Bayer Soler on 09/11/16.
  */
 public class Cotxe extends Thread {
     private Parking parking;
     private String matricula;
     Boolean parked = false;
+    Boolean isExit = false;
     int waitTime = 0;
     private Date dateParked;
     private Date dateUnParked;
@@ -33,8 +34,10 @@ public class Cotxe extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Se agrega el coche "+this.matricula+" en la cola del Parking.");
-        parking.addQueueListCotxe(this);
+        parking.debug("Se agrega el coche "+this.matricula+" en la cola del Parking.");
+        synchronized (parking.GateIn) {
+            parking.addQueueListCotxe(this);
+        }
         try {
             synchronized (this) {
                 this.wait();
@@ -43,9 +46,12 @@ public class Cotxe extends Thread {
             parking.QueueParkedCotxe().remove(this);
             this.parked = false;
             parking.QueueUnParkedCotxe().add(this);
+
+            synchronized (this) {
+                this.wait();
+            }
+
         }catch(InterruptedException e){}
-
-
     }
 
     @Override
@@ -54,9 +60,11 @@ public class Cotxe extends Thread {
                 "parking=" + parking +
                 ", matricula='" + matricula + '\'' +
                 ", parked=" + parked +
+                ", isExit=" + isExit +
                 ", waitTime=" + waitTime +
                 ", dateParked=" + dateParked +
                 ", dateUnParked=" + dateUnParked +
+                ", State=" + getState() +
                 '}';
     }
 }

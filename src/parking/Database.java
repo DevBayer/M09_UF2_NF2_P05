@@ -3,7 +3,7 @@ package parking;
 import java.util.ArrayList;
 
 /**
- * Created by 23878410v on 10/11/16.
+ * Created by Lluís Bayer Soler on 10/11/16.
  */
 public class Database {
     public final int numplaces;

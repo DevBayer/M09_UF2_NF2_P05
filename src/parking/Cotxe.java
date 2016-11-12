@@ -34,11 +34,12 @@ public class Cotxe extends Thread {
 
     @Override
     public void run() {
-        parking.debug("Se agrega el coche "+this.matricula+" en la cola del Parking.");
-        synchronized (parking.GateIn) {
-            parking.addQueueListCotxe(this);
-        }
         try {
+            parking.s.acquire();
+            parking.debug("Se agrega el coche "+this.matricula+" en la cola del Parking.");
+            synchronized (parking.GateIn) {
+                parking.addQueueListCotxe(this);
+            }
             synchronized (this) {
                 this.wait();
             }
@@ -52,6 +53,9 @@ public class Cotxe extends Thread {
             }
 
         }catch(InterruptedException e){}
+        finally{
+            parking.s.release();
+        }
     }
 
     @Override

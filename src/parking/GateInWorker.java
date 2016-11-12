@@ -17,7 +17,7 @@ public class GateInWorker extends Thread {
         while(true){
             parking.debug("GateInWorker::run()");
 
-            while(parking.hasAvailableSpace() && parking.hasQueueListCotxe() > 0){
+            while(parking.hasQueueListCotxe() > 0){
                     Cotxe c = parking.QueueListCotxe().get(0);
                 synchronized (this) {
                    //if(c != null) {

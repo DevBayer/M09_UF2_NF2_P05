@@ -1,6 +1,7 @@
 package parking;
 
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Lluís Bayer Soler on 09/11/16.
@@ -11,8 +12,10 @@ public class Parking {
     public GateInWorker GateIn;
     public GateOutWorker GateOut;
     boolean debug = false;
+    public Semaphore s;
 
     public Parking(int numplaces) {
+        this.s = new Semaphore(numplaces, true);
         this.data = new Database(numplaces);
         GateIn = new GateInWorker(this);
         GateOut = new GateOutWorker(this);
